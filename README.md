@@ -1,6 +1,6 @@
 # Medibuddy Project
 
-This is an ecommerce application which is a project under the guidance medibuddy
+This is an ecommerce application which is a project under the guidance of medibuddy
 
 ## Available Scripts
 
