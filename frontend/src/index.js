@@ -4,10 +4,11 @@ import './bootstrap.min.css';
 import './index.css';
 import App from './App';
 import axios from 'axios';
+import { Provider } from 'react-redux';
+import store from './store.js';
 // import reportWebVitals from './reportWebVitals';
 
 axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
-// console.log(process.env.REACT_APP_BASE_URL);
 
 axios.interceptors.request.use(
 	(request) => {
@@ -31,9 +32,9 @@ axios.interceptors.response.use(
 	}
 );
 ReactDOM.render(
-	<React.StrictMode>
+	<Provider store={store}>
 		<App />
-	</React.StrictMode>,
+	</Provider>,
 	document.getElementById('root')
 );
 

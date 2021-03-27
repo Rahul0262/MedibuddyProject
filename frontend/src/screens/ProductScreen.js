@@ -5,6 +5,7 @@ import {
 	Button,
 	Card,
 	Col,
+	Form,
 	Image,
 	ListGroup,
 	Row,
@@ -14,11 +15,13 @@ import { Link } from 'react-router-dom';
 import Rating from '../components/Rating';
 // import products from '../products';
 
-const ProductScreen = ({ match }) => {
+const ProductScreen = ({ history, match }) => {
 	const [product, setProduct] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [server, setServer] = useState(true);
 	const [errMsg, setErrMsg] = useState('Oh! Oh! Something went wrong...');
+	const [quantity, setQuantity] = useState(0);
+
 	useEffect(() => {
 		const fetchProduct = async () => {
 			axios
@@ -33,18 +36,23 @@ const ProductScreen = ({ match }) => {
 					setServer(false);
 					setErrMsg(err.response.data.message);
 				});
-			// const { data } = await axios.get(`/api/products/${match.params.id}`);
 		};
 		fetchProduct();
 	}, [match]);
-	// const product = products.find((p) => p._id === match.params.id);
+	const addtoCart = () => {
+		// console.log(`Yeah you have added ${match.params.id} to cart`);
+		if (quantity === 0)
+			history.push(`/cart/${match.params.id}?qty=${quantity + 1}`);
+		else history.push(`/cart/${match.params.id}?qty=${quantity}`);
+	};
 	return (
 		<>
 			<Link className='btn btn-light my-3' to='/'>
+				<i className='fas fa-chevron-left mr-2'></i>
 				Go Back
 			</Link>
 			{!server && (
-				<Row className='align'>
+				<Row className='justify-content-center'>
 					<Col sm={6} className='text-center'>
 						<Alert variant='danger'>{errMsg}</Alert>
 					</Col>
@@ -98,10 +106,32 @@ const ProductScreen = ({ match }) => {
 										</Col>
 									</Row>
 								</ListGroup.Item>
+								{product.countInStock > 0 && (
+									<ListGroup.Item>
+										<Row>
+											<Col>Quantity:</Col>
+											<Col>
+												<Form.Control
+													size='sm'
+													as='select'
+													value={quantity}
+													onChange={(e) => setQuantity(e.target.value)}
+												>
+													{[...Array(product.countInStock)].map((x, i) => (
+														<option key={i + 1} value={i + 1}>
+															{i + 1}
+														</option>
+													))}
+												</Form.Control>
+											</Col>
+										</Row>
+									</ListGroup.Item>
+								)}
 								<ListGroup.Item>
 									<Button
 										className='btn-block'
 										type='button'
+										onClick={() => addtoCart()}
 										disabled={product.countInStock === 0}
 									>
 										Add to cart
