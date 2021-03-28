@@ -2,18 +2,22 @@ import express from 'express';
 import dotenv from 'dotenv';
 // import products from './data/products.js';
 import productRoutes from './routes/productRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import connectDB from './config/db.js';
 
 dotenv.config();
 connectDB();
 const app = express();
+app.use(express.json());
 
+//middleware
 app.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+	res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
 	next();
 });
-//middlewares
+
 app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
 	res.send('APi is running...');
