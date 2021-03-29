@@ -13,6 +13,7 @@ app.use(express.json());
 //middleware
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+	res.header('Access-Control-Allow-Headers', '*');
 	next();
 });
 
