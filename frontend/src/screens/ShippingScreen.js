@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { saveShippingAddress } from '../actions/cartActions';
 import { createOrder } from '../actions/orderActions';
 
@@ -40,6 +41,8 @@ const ShippingScreen = ({ history }) => {
 			setMessage('Enter Country');
 		} else if (!postalCode) {
 			setMessage('Enter Postal Code');
+		} else if (cart.cartItems.length === 0) {
+			setMessage('Your Cart is Empty!! Start Shopping');
 		} else {
 			dispatch(
 				saveShippingAddress({
@@ -49,7 +52,6 @@ const ShippingScreen = ({ history }) => {
 					postalCode,
 				})
 			);
-			// history.push('/payment');
 			dispatch(
 				createOrder({
 					orderItems: cart.cartItems,
@@ -64,75 +66,86 @@ const ShippingScreen = ({ history }) => {
 			{error && (
 				<Row className='justify-content-center'>
 					<Col sm={6} className='text-center'>
-						<Alert variant='error'>{error}</Alert>
+						<Alert variant='danger'>{error}</Alert>
 					</Col>
 				</Row>
 			)}
 			{message && (
 				<Row className='justify-content-center'>
 					<Col sm={6} className='text-center'>
-						<Alert variant='error'>{message}</Alert>
+						<Alert variant='warning'>{message}</Alert>
 					</Col>
 				</Row>
 			)}
-			<Row className='justify-content-center'>
-				<Col md={6}>
-					<Form>
-						<Form.Group controlId='formBasicAddress'>
-							<Form.Label>Address</Form.Label>
-							<Form.Control
-								type='text'
-								placeholder='Enter Address'
-								value={address}
-								disabled={loading}
-								required
-								onChange={(e) => setAddress(e.target.value)}
-							/>
-						</Form.Group>
-						<Form.Group controlId='formBasicCity'>
-							<Form.Label>City</Form.Label>
-							<Form.Control
-								type='text'
-								placeholder='Enter City'
-								value={city}
-								disabled={loading}
-								required
-								onChange={(e) => setCity(e.target.value)}
-							/>
-						</Form.Group>
-						<Form.Group controlId='formBasicCountry'>
-							<Form.Label>Country</Form.Label>
-							<Form.Control
-								type='text'
-								placeholder='Enter Country'
-								value={country}
-								disabled={loading}
-								required
-								onChange={(e) => setCountry(e.target.value)}
-							/>
-						</Form.Group>
-						<Form.Group controlId='formBasicPostal'>
-							<Form.Label>Postal Code</Form.Label>
-							<Form.Control
-								type='number'
-								placeholder='Enter Postal'
-								value={postalCode}
-								disabled={loading}
-								required
-								onChange={(e) => setPostalCode(e.target.value)}
-							/>
-						</Form.Group>
+			{cart.cartItems.length === 0 ? (
+				<Row className='justify-content-center'>
+					<Col sm={6} className='text-center'>
+						<Link className='btn btn-light my-3' to='/'>
+							<i className='fas fa-shopping-bag mr-2'></i>
+							Continue Shopping
+						</Link>
+					</Col>
+				</Row>
+			) : (
+				<Row className='justify-content-center'>
+					<Col md={6}>
+						<Form>
+							<Form.Group controlId='formBasicAddress'>
+								<Form.Label>Address</Form.Label>
+								<Form.Control
+									type='text'
+									placeholder='Enter Address'
+									value={address}
+									disabled={loading}
+									required
+									onChange={(e) => setAddress(e.target.value)}
+								/>
+							</Form.Group>
+							<Form.Group controlId='formBasicCity'>
+								<Form.Label>City</Form.Label>
+								<Form.Control
+									type='text'
+									placeholder='Enter City'
+									value={city}
+									disabled={loading}
+									required
+									onChange={(e) => setCity(e.target.value)}
+								/>
+							</Form.Group>
+							<Form.Group controlId='formBasicCountry'>
+								<Form.Label>Country</Form.Label>
+								<Form.Control
+									type='text'
+									placeholder='Enter Country'
+									value={country}
+									disabled={loading}
+									required
+									onChange={(e) => setCountry(e.target.value)}
+								/>
+							</Form.Group>
+							<Form.Group controlId='formBasicPostal'>
+								<Form.Label>Postal Code</Form.Label>
+								<Form.Control
+									type='number'
+									placeholder='Enter Postal'
+									value={postalCode}
+									disabled={loading}
+									required
+									onChange={(e) => setPostalCode(e.target.value)}
+								/>
+							</Form.Group>
 
-						<Button
-							disabled={loading}
-							variant='primary'
-							onClick={submitHandler}
-						>
-							Submit & Place Order
-						</Button>
-					</Form>
-				</Col>
-			</Row>
+							<Button
+								disabled={loading}
+								variant='primary'
+								onClick={submitHandler}
+							>
+								Submit & Place Order
+							</Button>
+						</Form>
+					</Col>
+				</Row>
+			)}
 		</>
 	);
 };

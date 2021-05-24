@@ -19,6 +19,9 @@ export const createOrder = (orders) => async (dispatch, getState) => {
 			type: 'ORDER_CREATE_SUCCESS',
 			payload: data,
 		});
+		dispatch({
+			type: 'ORDER_CREATE_RESET',
+		});
 	} catch (error) {
 		dispatch({
 			type: 'ORDER_CREATE_FAILED',
