@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { loginUser } from '../actions/loginActions';
+import { loginUser } from '../actions/userActions';
 
 const LoginScreen = ({ history, location }) => {
 	const [email, setEmail] = useState('');
