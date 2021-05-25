@@ -18,7 +18,7 @@ const ShippingScreen = ({ history }) => {
 
 	const totalPrice = Number(
 		cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-	);
+	).toFixed(2);
 
 	const orderCreate = useSelector((state) => state.orderCreate);
 	const { loading, order, success, error } = orderCreate;

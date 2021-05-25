@@ -31,4 +31,9 @@ const getOrderById = asyncHandler(async (req, res) => {
 	}
 });
 
-export { createOrder, getOrderById };
+const getMyOrders = asyncHandler(async (req, res) => {
+	const orders = await Order.find({ user: req.user._id });
+	res.json(orders);
+});
+
+export { createOrder, getOrderById, getMyOrders };

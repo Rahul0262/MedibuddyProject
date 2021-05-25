@@ -30,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
 				password,
 			});
 			if (user) {
-				res.json({
+				res.status(201).json({
 					_id: user._id,
 					name: user.name,
 					email: user.email,
@@ -61,4 +61,40 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	}
 });
 
-export { authUser, getUserProfile, registerUser };
+const getAllUsers = asyncHandler(async (req, res) => {
+	const users = await User.find({});
+	res.json(users);
+});
+
+const updateUserProfile = asyncHandler(async (req, res) => {
+	const user = await User.findById(req.user._id);
+	if (user) {
+		user.name = req.body.name || user.name;
+		user.email = req.body.email || user.email;
+		if (req.body.password) {
+			user.password = req.body.password;
+		}
+
+		const updatedUser = await user.save();
+
+		if (updatedUser) {
+			res.json({
+				_id: updatedUser._id,
+				name: updatedUser.name,
+				email: updatedUser.email,
+				isAdmin: updatedUser.isAdmin,
+				token: generateToken(updatedUser._id),
+			});
+		}
+	} else {
+		res.status(404).json({ message: 'User not found' });
+	}
+});
+
+export {
+	authUser,
+	getUserProfile,
+	registerUser,
+	updateUserProfile,
+	getAllUsers,
+};

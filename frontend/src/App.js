@@ -11,6 +11,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ShippingScreen from './screens/ShippingScreen';
 import OrderScreen from './screens/OrderScreen';
+import UsersListScreen from './screens/UsersListScreen';
 
 function App() {
 	return (
@@ -22,6 +23,7 @@ function App() {
 					<Route path='/shipping' component={ShippingScreen} />
 					<Route path='/register' component={RegisterScreen} />
 					<Route path='/profile' component={ProfileScreen} />
+					<Route path='/admin/users' component={UsersListScreen} />
 					<Route path='/product/:id' component={ProductScreen} />
 					<Route path='/order/:id' component={OrderScreen} />
 					<Route path='/cart/:id?' component={CartScreen} />

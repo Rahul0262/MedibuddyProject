@@ -60,7 +60,7 @@ const OrderScreen = ({ match }) => {
 			)}
 			{server && !loading && (
 				<>
-					<Link className='btn btn-light my-3' to='/'>
+					<Link className='btn btn-light' to='/profile'>
 						<i className='fas fa-chevron-left mr-2'></i>
 						Go Back
 					</Link>
@@ -136,16 +136,22 @@ const OrderScreen = ({ match }) => {
 									<ListGroup.Item>
 										<Row>
 											<Col>Total Price</Col>
-											<Col>${order.totalPrice}</Col>
+											<Col>${order.totalPrice.toFixed(2)}</Col>
 										</Row>
 									</ListGroup.Item>
 									<ListGroup.Item>
 										<Row>
-											<Col>Staus</Col>
+											<Col>Status</Col>
 											<Col>
-												<Badge pill variant='success'>
-													Success
-												</Badge>
+												{order.isDelivered ? (
+													<Badge pill variant='success'>
+														Delivered
+													</Badge>
+												) : (
+													<Badge pill variant='warning'>
+														Proccessing
+													</Badge>
+												)}
 											</Col>
 										</Row>
 									</ListGroup.Item>
