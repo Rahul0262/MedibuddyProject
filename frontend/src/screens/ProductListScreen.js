@@ -1,11 +1,19 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Col, Row, Spinner, Table } from 'react-bootstrap';
+import {
+	Alert,
+	Button,
+	Col,
+	Image,
+	Row,
+	Spinner,
+	Table,
+} from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-const UsersListScreen = ({ history }) => {
-	const [users, setUsers] = useState([]);
+const ProductListScreen = ({ history }) => {
+	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [server, setServer] = useState(true);
 	const [error, setError] = useState('');
@@ -13,15 +21,16 @@ const UsersListScreen = ({ history }) => {
 
 	const login = useSelector((state) => state.login);
 	const { userInfo } = login;
-	const fetchAllUsers = async () => {
+
+	const fetchAllProducts = async () => {
 		axios
-			.get(`/api/users/allusers`, {
+			.get(`/api/products`, {
 				headers: {
 					Authorization: `Bearer ${userInfo.token}`,
 				},
 			})
 			.then((res) => {
-				setUsers(res.data);
+				setProducts(res.data);
 				setLoading(false);
 				setServer(true);
 			})
@@ -33,7 +42,7 @@ const UsersListScreen = ({ history }) => {
 	};
 	useEffect(() => {
 		if ((userInfo && userInfo.isAdmin) || isDeleted) {
-			fetchAllUsers();
+			fetchAllProducts();
 		} else {
 			history.push('/');
 		}
@@ -44,7 +53,7 @@ const UsersListScreen = ({ history }) => {
 			setIsDeleted(false);
 			setLoading(true);
 			axios
-				.delete(`/api/users/${id}`, {
+				.delete(`/api/products/${id}`, {
 					headers: {
 						Authorization: `Bearer ${userInfo.token}`,
 					},
@@ -73,50 +82,49 @@ const UsersListScreen = ({ history }) => {
 				</Row>
 			)}
 			<Row>
+				<Col sm={6}>
+					<h1> Products </h1>
+				</Col>
+				<Col sm={6} className='text-right'>
+					<Link to='/admin/product/create'>
+						<Button variant='dark'>Add Product</Button>
+					</Link>
+				</Col>
+			</Row>
+			<Row>
 				<Col className='text-center'>
-					<h1> Users </h1>
 					{loading ? (
 						<Row className='mt-4'>
 							<Col sm={12} className='text-center'>
 								<Spinner animation='border' />
 							</Col>
 						</Row>
-					) : users.length === 0 ? (
+					) : products.length === 0 ? (
 						<div className='my-3'>
-							<h6>Oops!! No Users yet</h6>
+							<h6>Oops!! No Products yet</h6>
 						</div>
 					) : (
 						<Table striped bordered size='sm' className='mt-4'>
 							<thead>
 								<tr>
-									<th>User Id</th>
-									<th>Name</th>
-									<th>Email</th>
-									<th>Admin</th>
+									<th>Product Id</th>
+									<th>Product Name</th>
+									<th>Price</th>
+									<th>Brand</th>
+									<th>Stock Count</th>
 									<th></th>
 								</tr>
 							</thead>
 							<tbody>
-								{users.map((item, index) => (
+								{products.map((item, index) => (
 									<tr key={index}>
 										<td>{item._id}</td>
 										<td>{item.name}</td>
-										<td>{item.email}</td>
+										<td>${item.price}</td>
+										<td>{item.brand}</td>
+										<td>{item.countInStock}</td>
 										<td>
-											{item.isAdmin ? (
-												<i
-													className='fas fa-check'
-													style={{ color: 'green' }}
-												></i>
-											) : (
-												<i
-													className='fas fa-times'
-													style={{ color: 'red' }}
-												></i>
-											)}
-										</td>
-										<td>
-											<Link to={`/admin/user/${item._id}/edit`}>
+											<Link to={`/admin/product/${item._id}/edit`}>
 												<Button variant='light' size='sm'>
 													<i className='fas fa-edit'></i>
 												</Button>
@@ -140,4 +148,4 @@ const UsersListScreen = ({ history }) => {
 	);
 };
 
-export default UsersListScreen;
+export default ProductListScreen;
