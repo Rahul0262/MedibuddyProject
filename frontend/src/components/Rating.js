@@ -64,7 +64,9 @@ const Rating = ({ value, numReviews, color }) => {
 					}
 				></i>
 			</span>
-			<span className='ml-1'>{numReviews ? numReviews + ' reviews' : ''}</span>
+			<span className='ml-1'>
+				{numReviews ? numReviews + ' reviews' : 'No reviews'}
+			</span>
 		</div>
 	);
 };

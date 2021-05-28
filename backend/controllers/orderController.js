@@ -2,7 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js'; // importing model
 
 const createOrder = asyncHandler(async (req, res) => {
-	const { orderItems, shippingAddress, totalPrice } = req.body;
+	const { orderItems, shippingAddress, totalPrice, paymentInfo } = req.body;
 
 	if (orderItems && orderItems.length === 0) {
 		res.status(400).json({ message: 'No order items;' });
@@ -12,6 +12,7 @@ const createOrder = asyncHandler(async (req, res) => {
 			user: req.user._id,
 			shippingAddress,
 			totalPrice,
+			paymentInfo,
 		});
 
 		const createdOrder = await order.save();

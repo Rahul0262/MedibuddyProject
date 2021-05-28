@@ -43,8 +43,11 @@ const orderSchema = mongoose.Schema(
 			required: true,
 			default: 0.0,
 		},
-		paidAt: {
-			type: Date,
+		paymentInfo: {
+			orderCreationId: { type: String, required: true },
+			razorpayPaymentId: { type: String, required: true },
+			razorpayOrderId: { type: String, required: true },
+			razorpaySignature: { type: String, required: true },
 		},
 		isDelivered: {
 			type: Boolean,

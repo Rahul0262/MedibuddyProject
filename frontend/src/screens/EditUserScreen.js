@@ -32,7 +32,6 @@ const EditUserScreen = ({ history, match }) => {
 		if (!userInfo) {
 			history.push('/login');
 		} else if (userInfo && userInfo.isAdmin) {
-			console.log('entered');
 			axios
 				.get(`/api/users/${match.params.id}`, {
 					headers: {

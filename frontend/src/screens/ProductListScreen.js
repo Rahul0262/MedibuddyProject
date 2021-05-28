@@ -120,7 +120,7 @@ const ProductListScreen = ({ history }) => {
 									<tr key={index}>
 										<td>{item._id}</td>
 										<td>{item.name}</td>
-										<td>${item.price}</td>
+										<td>₹{item.price}</td>
 										<td>{item.brand}</td>
 										<td>{item.countInStock}</td>
 										<td>

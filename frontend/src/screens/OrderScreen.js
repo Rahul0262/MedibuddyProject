@@ -106,7 +106,7 @@ const OrderScreen = ({ match }) => {
 														</Link>
 													</Col>
 													<Col md={4}>
-														{item.qty} x ${item.price} = $
+														{item.qty} x ₹{item.price} = ₹
 														{item.qty * item.price}
 													</Col>
 												</Row>
@@ -136,7 +136,7 @@ const OrderScreen = ({ match }) => {
 									<ListGroup.Item>
 										<Row>
 											<Col>Total Price</Col>
-											<Col>${order.totalPrice.toFixed(2)}</Col>
+											<Col>₹{order.totalPrice.toFixed(2)}</Col>
 										</Row>
 									</ListGroup.Item>
 									<ListGroup.Item>
