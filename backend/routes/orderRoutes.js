@@ -4,11 +4,16 @@ import {
 	createOrder,
 	getOrderById,
 	getMyOrders,
+	getOrders,
+	deliverOrder,
 } from '../controllers/orderController.js';
-import { protect } from '../middlewares/authMiddleware.js';
+import { isAdmin, protect } from '../middlewares/authMiddleware.js';
 
-router.route('/').post(protect, createOrder);
+router.route('/').post(protect, createOrder).get(protect, isAdmin, getOrders);
 router.route('/myorders').get(protect, getMyOrders);
-router.route('/:id').get(protect, getOrderById);
+router
+	.route('/:id')
+	.get(protect, getOrderById)
+	.put(protect, isAdmin, deliverOrder);
 
 export default router;

@@ -10,22 +10,27 @@ import {
 	Spinner,
 	Alert,
 	Badge,
+	Button,
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
-const OrderScreen = ({ match }) => {
+const OrderScreen = ({ match, history }) => {
 	const [order, setOrder] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [server, setServer] = useState(true);
 	const [errMsg, setErrMsg] = useState('Oh! Oh! Something went wrong...');
+	const [deliverLoader, setDeliverLoader] = useState(false);
+
 	const login = useSelector((state) => state.login);
+	const { userInfo } = login;
+
 	useEffect(() => {
-		const fetchOrder = async () => {
+		if (userInfo) {
 			axios
 				.get(`/api/orders/${match.params.id}`, {
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${login.userInfo.token}`,
+						Authorization: `Bearer ${userInfo.token}`,
 					},
 				})
 				.then((res) => {
@@ -38,9 +43,35 @@ const OrderScreen = ({ match }) => {
 					setServer(false);
 					setErrMsg(err.response.data.message);
 				});
-		};
-		fetchOrder();
-	}, [match]);
+		} else {
+			history.push('/');
+		}
+	}, [history, match, userInfo]);
+
+	const markAsDelivered = () => {
+		if (window.confirm('Are you sure?')) {
+			setDeliverLoader(true);
+			axios
+				.put(
+					`/api/orders/${match.params.id}`,
+					{
+						orderId: match.params.id,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${userInfo.token}`,
+						},
+					}
+				)
+				.then((res) => {
+					setDeliverLoader(false);
+					setOrder(res.data);
+				})
+				.catch((err) => {
+					setDeliverLoader(false);
+				});
+		}
+	};
 
 	return (
 		<>
@@ -62,7 +93,7 @@ const OrderScreen = ({ match }) => {
 				<>
 					<Link className='btn btn-light' to='/profile'>
 						<i className='fas fa-chevron-left mr-2'></i>
-						Go Back
+						My Orders
 					</Link>
 					<Row>
 						<Col md={8}>
@@ -157,6 +188,21 @@ const OrderScreen = ({ match }) => {
 									</ListGroup.Item>
 								</ListGroup>
 							</Card>
+							{userInfo && userInfo.isAdmin && !order.isDelivered && (
+								<Button
+									className='my-3'
+									disabled={deliverLoader}
+									block
+									variant='dark'
+									onClick={() => markAsDelivered()}
+								>
+									{deliverLoader ? (
+										<Spinner animation='border' size='sm' />
+									) : (
+										'Mark As Delivered'
+									)}
+								</Button>
+							)}
 						</Col>
 					</Row>
 				</>
