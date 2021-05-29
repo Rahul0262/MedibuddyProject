@@ -6,6 +6,39 @@ const getProducts = asyncHandler(async (req, res) => {
 	res.json(products);
 });
 
+const addReview = asyncHandler(async (req, res) => {
+	const review = req.body;
+	const product = await Product.findById(req.body.productId);
+	if (
+		product.reviews.findIndex(
+			(r) => r.user.toString() == req.user._id.toString()
+		) == -1
+	) {
+		try {
+			const newReviews = {
+				name: review.name,
+				rating: Number(review.rating),
+				comment: review.comment,
+				user: req.user._id,
+			};
+			product.reviews.push(newReviews);
+			product.numReviews = product.reviews.length;
+			product.rating =
+				product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+				product.reviews.length;
+			const updatedProduct = await product.save();
+			if (updatedProduct) {
+				res.status(201).json(updatedProduct);
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(404).json({ message: 'Unable to add the review' });
+		}
+	} else {
+		res.status(400).json({ message: 'User already reviewed' });
+	}
+});
+
 const createProduct = asyncHandler(async (req, res) => {
 	const product = req.body;
 	const data = {
@@ -72,4 +105,5 @@ export {
 	deleteProduct,
 	createProduct,
 	updateProduct,
+	addReview,
 };

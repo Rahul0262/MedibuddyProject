@@ -7,10 +7,15 @@ export const listProducts = () => async (dispatch) => {
 		});
 
 		const { data } = await axios.get('/api/products');
-
+		const topProducts = [...data]
+			.sort((a, b) => b.rating - a.rating)
+			.slice(0, 3);
 		dispatch({
 			type: 'PRODUCT_LIST_SUCCESS',
-			payload: data,
+			payload: {
+				products: data,
+				topProducts,
+			},
 		});
 	} catch (error) {
 		dispatch({

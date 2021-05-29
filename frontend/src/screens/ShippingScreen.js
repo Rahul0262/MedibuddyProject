@@ -59,7 +59,7 @@ const ShippingScreen = ({ history }) => {
 		}
 
 		const result = await axios.post('/api/payment/order', {
-			amount: Number(totalPrice) * 100,
+			amount: (Number(totalPrice) * 100).toFixed(),
 		});
 
 		if (!result) {

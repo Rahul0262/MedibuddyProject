@@ -3,6 +3,7 @@ import Razorpay from 'razorpay';
 
 const createOrder = asyncHandler(async (req, res) => {
 	try {
+		console.log(req.body.amount);
 		const instance = new Razorpay({
 			key_id: process.env.RAZORPAY_KEY_ID,
 			key_secret: process.env.RAZORPAY_SECRET,
@@ -11,7 +12,7 @@ const createOrder = asyncHandler(async (req, res) => {
 		const options = {
 			amount: req.body.amount, // amount in smallest currency unit
 			currency: 'INR',
-			receipt: 'receipt_order_1234',
+			receipt: 'receipt_order_234',
 		};
 
 		const order = await instance.orders.create(options);

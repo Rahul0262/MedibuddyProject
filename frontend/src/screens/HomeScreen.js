@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
 import { Alert, Col, Row, Spinner } from 'react-bootstrap';
-// import axios from 'axios';
 import Product from '../components/Product';
 import { useDispatch, useSelector } from 'react-redux';
 import { listProducts } from '../actions/productActions';
+import TopProducts from '../components/TopProducts';
 
 const HomeScreen = () => {
 	const dispatch = useDispatch();
 	const productList = useSelector((state) => state.productList);
-	const { loading, error, products } = productList;
-
+	const { loading, error, products, topProducts } = productList;
 	useEffect(() => {
 		dispatch(listProducts());
 		/* Instead of direct calling we used reducers */
@@ -20,10 +19,8 @@ const HomeScreen = () => {
 		// };
 		// fetchProducts();
 	}, [dispatch]);
-
 	return (
 		<>
-			<h1>Latest Products</h1>
 			{loading && (
 				<Row>
 					<Col sm={12} className='text-center'>
@@ -38,14 +35,18 @@ const HomeScreen = () => {
 					</Col>
 				</Row>
 			)}
-			{products && (
-				<Row>
-					{products.map((product) => (
-						<Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-							<Product product={product} />
-						</Col>
-					))}
-				</Row>
+			{topProducts && products && !loading && (
+				<>
+					<TopProducts topProducts={topProducts} />
+					<h1 className='mt-3'>Our Products</h1>
+					<Row>
+						{products.map((product) => (
+							<Col key={product._id} sm={12} md={6} lg={4} xl={3}>
+								<Product product={product} />
+							</Col>
+						))}
+					</Row>
+				</>
 			)}
 		</>
 	);

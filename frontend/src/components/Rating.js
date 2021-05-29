@@ -1,7 +1,7 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 
-const Rating = ({ value, numReviews, color }) => {
+const Rating = ({ value, numReviews, color, review }) => {
 	return (
 		<div className='rating'>
 			<span>
@@ -65,17 +65,19 @@ const Rating = ({ value, numReviews, color }) => {
 				></i>
 			</span>
 			<span className='ml-1'>
-				{numReviews ? numReviews + ' reviews' : 'No reviews'}
+				{numReviews ? numReviews + ' reviews' : review ? '' : 'No reviews'}
 			</span>
 		</div>
 	);
 };
 Rating.defaultProps = {
 	color: '#f8e825',
+	review: false,
 };
 Rating.propTypes = {
 	value: PropTypes.number.isRequired,
-	numReviews: PropTypes.number.isRequired,
+	numReviews: PropTypes.number,
 	color: PropTypes.string,
+	review: PropTypes.bool,
 };
 export default Rating;
