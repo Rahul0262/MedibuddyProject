@@ -42,8 +42,6 @@ const ProductListScreen = ({ history }) => {
 			});
 	};
 
-	
-
 	useEffect(() => {
 		if ((userInfo && userInfo.isAdmin) || isDeleted) {
 			fetchAllProducts();
@@ -51,6 +49,14 @@ const ProductListScreen = ({ history }) => {
 			history.push('/');
 		}
 	}, [userInfo, isDeleted]);
+
+	const config = {
+		bucketName: process.env.REACT_APP_BUCKET_NAME,
+		dirName: process.env.REACT_APP_DIR_NAME,
+		region: process.env.REACT_APP_REGION,
+		accessKeyId: process.env.REACT_APP_ACCESSKEY,
+		secretAccessKey: process.env.REACT_APP_SECRET,
+	};
 
 	const deleteImage = (img) => {
 		const arr = img.split('/');

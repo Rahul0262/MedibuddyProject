@@ -77,6 +77,14 @@ const EditProductScreen = ({ history, match }) => {
 		}
 	}, [history, userInfo]);
 
+	const config = {
+		bucketName: process.env.REACT_APP_BUCKET_NAME,
+		dirName: process.env.REACT_APP_DIR_NAME,
+		region: process.env.REACT_APP_REGION,
+		accessKeyId: process.env.REACT_APP_ACCESSKEY,
+		secretAccessKey: process.env.REACT_APP_SECRET,
+	};
+
 	const uploadHandler = async (e) => {
 		console.log(e.target.files);
 		reactS3
