@@ -20,14 +20,6 @@ const EditProductScreen = ({ history, match }) => {
 	const login = useSelector((state) => state.login);
 	const { userInfo } = login;
 
-	const config = {
-		bucketName: 'mynewbucket-medibuddy',
-		dirName: 'ProductImages',
-		region: 'ap-south-1',
-		accessKeyId: 'AKIARB27M42M24S3PYAT',
-		secretAccessKey: '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',
-	};
-
 	const updateProduct = async () => {
 		setLoading(true);
 		axios

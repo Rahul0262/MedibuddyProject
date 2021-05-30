@@ -56,14 +56,6 @@ const AddProductScreen = ({ history, match }) => {
 		}
 	}, [history, userInfo]);
 
-	const config = {
-		bucketName: 'mynewbucket-medibuddy',
-		dirName: 'ProductImages',
-		region: 'ap-south-1',
-		accessKeyId: 'AKIARB27M42M24S3PYAT',
-		secretAccessKey: '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',
-	};
-
 	const uploadHandler = async (e) => {
 		console.log(e.target.files);
 		reactS3

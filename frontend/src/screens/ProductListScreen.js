@@ -42,13 +42,7 @@ const ProductListScreen = ({ history }) => {
 			});
 	};
 
-	const config = {
-		bucketName: 'mynewbucket-medibuddy',
-		dirName: 'ProductImages',
-		region: 'ap-south-1',
-		accessKeyId: 'AKIARB27M42M24S3PYAT',
-		secretAccessKey: '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',
-	};
+	
 
 	useEffect(() => {
 		if ((userInfo && userInfo.isAdmin) || isDeleted) {
