@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import reactS3 from 'react-s3';
 
 const ProductListScreen = ({ history }) => {
 	const [products, setProducts] = useState([]);
@@ -40,6 +41,15 @@ const ProductListScreen = ({ history }) => {
 				setServer(false);
 			});
 	};
+
+	const config = {
+		bucketName: 'mynewbucket-medibuddy',
+		dirName: 'ProductImages',
+		region: 'ap-south-1',
+		accessKeyId: 'AKIARB27M42M24S3PYAT',
+		secretAccessKey: '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',
+	};
+
 	useEffect(() => {
 		if ((userInfo && userInfo.isAdmin) || isDeleted) {
 			fetchAllProducts();
@@ -48,12 +58,20 @@ const ProductListScreen = ({ history }) => {
 		}
 	}, [userInfo, isDeleted]);
 
-	const deleteUserHandler = (id) => {
+	const deleteImage = (img) => {
+		const arr = img.split('/');
+		reactS3
+			.deleteFile(arr[arr.length - 1], config)
+			.then((response) => console.log(response))
+			.catch((err) => console.error(err));
+	};
+
+	const deleteUserHandler = (item) => {
 		if (window.confirm('Are you sure?')) {
 			setIsDeleted(false);
 			setLoading(true);
 			axios
-				.delete(`/api/products/${id}`, {
+				.delete(`/api/products/${item._id}`, {
 					headers: {
 						Authorization: `Bearer ${userInfo.token}`,
 					},
@@ -62,6 +80,7 @@ const ProductListScreen = ({ history }) => {
 					setIsDeleted(true);
 					setLoading(false);
 					// setServer(true);
+					deleteImage(item.image);
 				})
 				.catch((err) => {
 					setIsDeleted(false);
@@ -132,7 +151,7 @@ const ProductListScreen = ({ history }) => {
 											<Button
 												variant='danger'
 												size='sm'
-												onClick={() => deleteUserHandler(item._id)}
+												onClick={() => deleteUserHandler(item)}
 											>
 												<i className='fas fa-trash'></i>
 											</Button>
