@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { Alert, Button, Col, Form, Image, Row, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import reactS3 from 'react-s3';
 
 const EditProductScreen = ({ history, match }) => {
 	const [name, setName] = useState('');
@@ -11,13 +12,21 @@ const EditProductScreen = ({ history, match }) => {
 	const [description, setDescription] = useState('');
 	const [brand, setBrand] = useState('');
 	const [category, setCategory] = useState('');
-	// const [image, setImage] = useState('/images/airpods.jpg');
+	const [image, setImage] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [message, setMessage] = useState(null);
 
 	const login = useSelector((state) => state.login);
 	const { userInfo } = login;
+
+	const config = {
+		bucketName: 'mynewbucket-medibuddy',
+		dirName: 'ProductImages',
+		region: 'ap-south-1',
+		accessKeyId: 'AKIARB27M42M24S3PYAT',
+		secretAccessKey: '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',
+	};
 
 	const updateProduct = async () => {
 		setLoading(true);
@@ -31,6 +40,7 @@ const EditProductScreen = ({ history, match }) => {
 					description,
 					brand,
 					category,
+					image,
 				},
 				{
 					headers: {
@@ -64,6 +74,7 @@ const EditProductScreen = ({ history, match }) => {
 					setCategory(res.data.category);
 					setDescription(res.data.description);
 					setPrice(res.data.price);
+					setImage(res.data.image);
 				})
 				.catch((err) => {
 					setLoading(true);
@@ -73,6 +84,19 @@ const EditProductScreen = ({ history, match }) => {
 			history.push('/');
 		}
 	}, [history, userInfo]);
+
+	const uploadHandler = async (e) => {
+		console.log(e.target.files);
+		reactS3
+			.uploadFile(e.target.files[0], config)
+			.then((data) => {
+				console.log(data);
+				setImage(data.location);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
 
 	const createHandler = (e) => {
 		e.preventDefault();
@@ -88,11 +112,9 @@ const EditProductScreen = ({ history, match }) => {
 			setMessage('Brand should not be empty');
 		} else if (!category) {
 			setMessage('Category should not be empty');
-		}
-		// else if (!image) {
-		// 	setMessage('Image should not be empty');
-		// }
-		else {
+		} else if (!image) {
+			setMessage('Image should not be empty');
+		} else {
 			updateProduct();
 		}
 	};
@@ -122,6 +144,23 @@ const EditProductScreen = ({ history, match }) => {
 					<Col md={6}>
 						<h1> Edit Product </h1>
 						<Form>
+							{image && (
+								<Row className='align-items-center mb-3'>
+									<Col md={8}>
+										Image
+										<Image rounded src={image} sizes='200' fluid></Image>
+									</Col>
+									<Col md={2}>
+										<Button onClick={(e) => setImage('')}>Remove</Button>
+									</Col>
+								</Row>
+							)}
+							{!image && (
+								<Form.Group controlId='formBasicFile'>
+									<Form.Label>Image</Form.Label>
+									<Form.File onChange={uploadHandler} />
+								</Form.Group>
+							)}
 							<Form.Group controlId='formBasicName'>
 								<Form.Label>Name</Form.Label>
 								<Form.Control
@@ -142,6 +181,7 @@ const EditProductScreen = ({ history, match }) => {
 									onChange={(e) => setDescription(e.target.value)}
 								/>
 							</Form.Group>
+
 							<Form.Group controlId='formBasicBrand'>
 								<Form.Label>Brand</Form.Label>
 								<Form.Control

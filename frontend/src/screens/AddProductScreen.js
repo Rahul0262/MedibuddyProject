@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import reactS3 from 'react-s3';
 
 const AddProductScreen = ({ history, match }) => {
 	const [name, setName] = useState('');
@@ -11,7 +12,7 @@ const AddProductScreen = ({ history, match }) => {
 	const [description, setDescription] = useState('');
 	const [brand, setBrand] = useState('');
 	const [category, setCategory] = useState('');
-	const [image, setImage] = useState('/images/airpods.jpg');
+	const [image, setImage] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const [message, setMessage] = useState(null);
@@ -54,6 +55,27 @@ const AddProductScreen = ({ history, match }) => {
 			history.push('/');
 		}
 	}, [history, userInfo]);
+
+	const config = {
+		bucketName: 'mynewbucket-medibuddy',
+		dirName: 'ProductImages',
+		region: 'ap-south-1',
+		accessKeyId: 'AKIARB27M42M24S3PYAT',
+		secretAccessKey: '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',
+	};
+
+	const uploadHandler = async (e) => {
+		console.log(e.target.files);
+		reactS3
+			.uploadFile(e.target.files[0], config)
+			.then((data) => {
+				console.log(data);
+				setImage(data.location);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
 
 	const createHandler = (e) => {
 		e.preventDefault();
@@ -121,6 +143,10 @@ const AddProductScreen = ({ history, match }) => {
 									onChange={(e) => setDescription(e.target.value)}
 								/>
 							</Form.Group>
+							<Form.Group controlId='formBasicFile'>
+								<Form.Label>Image</Form.Label>
+								<Form.File onChange={uploadHandler} />
+							</Form.Group>
 							<Form.Group controlId='formBasicBrand'>
 								<Form.Label>Brand</Form.Label>
 								<Form.Control
@@ -170,7 +196,7 @@ const AddProductScreen = ({ history, match }) => {
 								{loading ? (
 									<Spinner size='sm' animation='border' />
 								) : (
-									'Release Product'
+									'Launch Product'
 								)}
 							</Button>
 						</Form>

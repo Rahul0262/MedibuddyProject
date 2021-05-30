@@ -6,7 +6,7 @@ const Review = ({ name, rating, comment }) => {
 	return (
 		<div className='review'>
 			<span>{name}</span>
-			<Rating value={rating} review></Rating>
+			<Rating value={rating} review={true}></Rating>
 			<br />
 			<p>{comment}</p>
 		</div>
