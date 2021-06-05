@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import store from './store.js';
 // import reportWebVitals from './reportWebVitals';
 
-axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
+// axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 
 axios.interceptors.request.use(
 	(request) => {

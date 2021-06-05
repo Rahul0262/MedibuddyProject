@@ -3,12 +3,22 @@ import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { productListReducer } from './reducers/productReducers';
 import { cartReducer } from './reducers/cartReducers';
-import { logintReducers } from './reducers/LoginReducers';
+import { orderCreateReducer } from './reducers/orderReducers';
+import {
+	logintReducers,
+	registerReducers,
+	userDetailsReducers,
+	userUpdateReducers,
+} from './reducers/userReducers';
 
 const reducer = combineReducers({
 	login: logintReducers,
 	productList: productListReducer,
 	cart: cartReducer,
+	register: registerReducers,
+	userDetails: userDetailsReducers,
+	userUpdate: userUpdateReducers,
+	orderCreate: orderCreateReducer,
 });
 
 const cartItemsfromStorage = localStorage.getItem('cartItems')
@@ -16,11 +26,17 @@ const cartItemsfromStorage = localStorage.getItem('cartItems')
 	: [];
 const userInfofromStorage = localStorage.getItem('user')
 	? JSON.parse(localStorage.getItem('user'))
+	: {}; //ikkada null return cheyyali else condition lo
+const shippingAddfromStorage = localStorage.getItem('shippingAddress')
+	? JSON.parse(localStorage.getItem('shippingAddress'))
 	: {};
 
 //Initial State when app loaded
 const initialState = {
-	cart: { cartItems: cartItemsfromStorage },
+	cart: {
+		cartItems: cartItemsfromStorage,
+		shippingAddress: shippingAddfromStorage,
+	},
 	login: { userInfo: userInfofromStorage },
 };
 
