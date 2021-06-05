@@ -7,6 +7,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import awsRoutes from './routes/awsRoutes.js';
 import connectDB from './config/db.js';
+import path from 'path';
 
 dotenv.config();
 connectDB();
@@ -27,9 +28,17 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/aws', awsRoutes);
 
-app.get('/', (req, res) => {
-	res.send('APi is running...');
-});
+const __dirname = path.resolve();
+if (process.env.NODE_ENV === 'production') {
+	app.use(express.static(path.join(__dirname, '/frontend/build')));
+	app.get('*', (req, res) =>
+		res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+	);
+} else {
+	app.get('/', (req, res) => {
+		res.send('APi is running...');
+	});
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log(`Server started running on port ${PORT}`));
