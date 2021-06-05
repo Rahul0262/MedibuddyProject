@@ -40,14 +40,20 @@ const addReview = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
-	const product = req.body;
+	// const product = req.body;
 	const data = {
 		numReviews: 0,
 		rating: 0,
-		...product,
+		price: req.body.price,
+		countInStock: req.body.countInStock,
+		name: req.body.name,
+		image: `https://${process.env.REACT_APP_BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${req.body.image}`,
+		description: req.body.description,
+		brand: req.body.brand,
+		category: req.body.category,
 		user: req.user._id,
 	};
-	console.log(data);
+	// console.log(data);
 	try {
 		const createdProduct = await Product.create(data);
 		if (createdProduct) {
@@ -65,7 +71,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 		product.price = req.body.price || product.price;
 		product.countInStock = req.body.countInStock || product.countInStock;
 		product.name = req.body.name || product.name;
-		product.image = req.body.image;
+		product.image = `https://${process.env.REACT_APP_BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${req.body.image}`;
 		product.description = req.body.description || product.description;
 		product.brand = req.body.brand || product.brand;
 		product.category = req.body.category || product.category;

@@ -13,33 +13,85 @@ const EditProductScreen = ({ history, match }) => {
 	const [brand, setBrand] = useState('');
 	const [category, setCategory] = useState('');
 	const [image, setImage] = useState('');
+	const [file, setFile] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [message, setMessage] = useState(null);
+	const [isRemoved, setIsRemoved] = useState(false);
 
 	const login = useSelector((state) => state.login);
 	const { userInfo } = login;
 
-	const updateProduct = async () => {
+	const upload_file_to_s3 = (url, form, filename) => {
 		setLoading(true);
 		axios
-			.put(
-				`/api/products/${match.params.id}`,
+			.post(url, form)
+			.then((res) => {
+				console.log(res, filename);
+				setFile(null);
+				setLoading(false);
+				updateProduct(filename);
+			})
+			.catch((err) => {
+				console.log(err);
+				setLoading(false);
+				setFile(null);
+			});
+	};
+
+	const genrates3url = () => {
+		setLoading(true);
+		const randomID = parseInt(Math.random() * 10000000);
+		const filename = `${randomID}.jpg`;
+		axios
+			.post(
+				'/api/aws/generatePreSignedUrl',
 				{
-					price,
-					countInStock,
-					name,
-					description,
-					brand,
-					category,
-					image,
+					filename: filename,
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${login.userInfo.token}`,
+						Authorization: `Bearer ${userInfo.token}`,
 					},
 				}
 			)
+			.then((res) => {
+				console.log(res);
+				const form = new FormData();
+				Object.keys(res.data.fields).forEach((key) => {
+					form.append(key, res.data.fields[key]);
+				});
+				form.append('file', file);
+				setLoading(false);
+				upload_file_to_s3(res.data.url, form, filename);
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+			});
+	};
+
+	const updateProduct = async (filename = null) => {
+		setLoading(true);
+		const data = {
+			price,
+			countInStock,
+			name,
+			description,
+			brand,
+			category,
+		};
+		if (isRemoved) {
+			data.image = filename;
+		} else {
+			data.image = image.split('/').pop();
+		}
+		axios
+			.put(`/api/products/${match.params.id}`, data, {
+				headers: {
+					Authorization: `Bearer ${login.userInfo.token}`,
+				},
+			})
 			.then((res) => {
 				setLoading(false);
 				history.push('/admin/products');
@@ -77,21 +129,49 @@ const EditProductScreen = ({ history, match }) => {
 		}
 	}, [history, userInfo]);
 
-	const config = {
-		bucketName: process.env.REACT_APP_BUCKET_NAME,
-		dirName: process.env.REACT_APP_DIR_NAME,
-		region: process.env.REACT_APP_REGION,
-		accessKeyId: process.env.REACT_APP_ACCESSKEY,
-		secretAccessKey: process.env.REACT_APP_SECRET,
-	};
+	// const config = {
+	// 	bucketName: process.env.REACT_APP_BUCKET_NAME,
+	// 	dirName: process.env.REACT_APP_DIR_NAME,
+	// 	region: process.env.REACT_APP_REGION,
+	// 	accessKeyId: process.env.REACT_APP_ACCESSKEY,
+	// 	secretAccessKey: process.env.REACT_APP_SECRET,
+	// };
 
 	const uploadHandler = async (e) => {
 		console.log(e.target.files);
-		reactS3
-			.uploadFile(e.target.files[0], config)
-			.then((data) => {
-				console.log(data);
-				setImage(data.location);
+		if (e.target.files.length !== 0) {
+			setFile(
+				Array.from(e.target.files).filter((f) => {
+					const ext = f.name.split('.').pop();
+					return ext === 'jpeg' || ext === 'png' || ext === 'jpg';
+				})[0]
+			);
+		} else {
+			setFile(null);
+		}
+		// reactS3
+		// 	.uploadFile(e.target.files[0], config)
+		// 	.then((data) => {
+		// 		console.log(data);
+		// 		setImage(data.location);
+		// 	})
+		// 	.catch((err) => {
+		// 		console.log(err);
+		// 	});
+	};
+
+	const removeHandler = (img) => {
+		const arr = img.split('/');
+		axios
+			.delete(`/api/aws/${arr[arr.length - 1]}`, {
+				headers: {
+					Authorization: `Bearer ${userInfo.token}`,
+				},
+			})
+			.then((res) => {
+				console.log(res);
+				setImage('');
+				setIsRemoved(true);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -112,10 +192,20 @@ const EditProductScreen = ({ history, match }) => {
 			setMessage('Brand should not be empty');
 		} else if (!category) {
 			setMessage('Category should not be empty');
-		} else if (!image) {
-			setMessage('Image should not be empty');
 		} else {
-			updateProduct();
+			if (isRemoved) {
+				if (!file) {
+					setMessage('Image should not be empty');
+				} else {
+					genrates3url();
+				}
+			} else {
+				if (!image) {
+					setMessage('Image should not be empty');
+				} else {
+					updateProduct();
+				}
+			}
 		}
 	};
 
@@ -151,7 +241,9 @@ const EditProductScreen = ({ history, match }) => {
 										<Image rounded src={image} sizes='200' fluid></Image>
 									</Col>
 									<Col md={2}>
-										<Button onClick={(e) => setImage('')}>Remove</Button>
+										<Button onClick={(e) => removeHandler(image)}>
+											Remove
+										</Button>
 									</Col>
 								</Row>
 							)}

@@ -11,7 +11,7 @@ import {
 } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import reactS3 from 'react-s3';
+// import reactS3 from 'react-s3';
 
 const ProductListScreen = ({ history }) => {
 	const [products, setProducts] = useState([]);
@@ -50,20 +50,32 @@ const ProductListScreen = ({ history }) => {
 		}
 	}, [userInfo, isDeleted]);
 
-	const config = {
-		bucketName: process.env.REACT_APP_BUCKET_NAME,
-		dirName: process.env.REACT_APP_DIR_NAME,
-		region: process.env.REACT_APP_REGION,
-		accessKeyId: process.env.REACT_APP_ACCESSKEY,
-		secretAccessKey: process.env.REACT_APP_SECRET,
-	};
+	// const config = {
+	// 	bucketName: process.env.REACT_APP_BUCKET_NAME,
+	// 	dirName: process.env.REACT_APP_DIR_NAME,
+	// 	region: process.env.REACT_APP_REGION,
+	// 	accessKeyId: process.env.REACT_APP_ACCESSKEY,
+	// 	secretAccessKey: process.env.REACT_APP_SECRET,
+	// };
 
 	const deleteImage = (img) => {
 		const arr = img.split('/');
-		reactS3
-			.deleteFile(arr[arr.length - 1], config)
-			.then((response) => console.log(response))
-			.catch((err) => console.error(err));
+		axios
+			.delete(`/api/aws/${arr[arr.length - 1]}`, {
+				headers: {
+					Authorization: `Bearer ${userInfo.token}`,
+				},
+			})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+		// reactS3
+		// 	.deleteFile(arr[arr.length - 1], config)
+		// 	.then((response) => console.log(response))
+		// 	.catch((err) => console.error(err));
 	};
 
 	const deleteUserHandler = (item) => {

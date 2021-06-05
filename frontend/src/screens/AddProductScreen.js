@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import reactS3 from 'react-s3';
+// import reactS3 from 'react-s3';
 
 const AddProductScreen = ({ history, match }) => {
 	const [name, setName] = useState('');
@@ -12,34 +12,82 @@ const AddProductScreen = ({ history, match }) => {
 	const [description, setDescription] = useState('');
 	const [brand, setBrand] = useState('');
 	const [category, setCategory] = useState('');
-	const [image, setImage] = useState('');
+	// const [image, setImage] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const [message, setMessage] = useState(null);
+	const [file, setFile] = useState(null);
 
 	const login = useSelector((state) => state.login);
 	const { userInfo } = login;
 
-	const createProduct = async () => {
+	const upload_file_to_s3 = (url, form, filename) => {
 		setLoading(true);
 		axios
+			.post(url, form)
+			.then((res) => {
+				console.log(res, filename);
+				setFile(null);
+				setLoading(false);
+				createProduct(filename);
+			})
+			.catch((err) => {
+				console.log(err);
+				setLoading(false);
+				setFile(null);
+			});
+	};
+
+	const genrates3url = () => {
+		setLoading(true);
+		const randomID = parseInt(Math.random() * 10000000);
+		const filename = `${randomID}.jpg`;
+		axios
 			.post(
-				`/api/products`,
+				'/api/aws/generatePreSignedUrl',
 				{
-					price,
-					countInStock,
-					name,
-					image,
-					description,
-					brand,
-					category,
+					filename: filename,
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${login.userInfo.token}`,
+						Authorization: `Bearer ${userInfo.token}`,
 					},
 				}
 			)
+			.then((res) => {
+				console.log(res);
+				const form = new FormData();
+				Object.keys(res.data.fields).forEach((key) => {
+					form.append(key, res.data.fields[key]);
+				});
+				form.append('file', file);
+				setLoading(false);
+				upload_file_to_s3(res.data.url, form, filename);
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+			});
+	};
+
+	const createProduct = async (filename) => {
+		setLoading(true);
+		const data = {
+			price,
+			countInStock,
+			name,
+			image: filename,
+			description,
+			brand,
+			category,
+		};
+		// console.log(data);
+		axios
+			.post(`/api/products`, data, {
+				headers: {
+					Authorization: `Bearer ${login.userInfo.token}`,
+				},
+			})
 			.then((res) => {
 				setLoading(false);
 				history.push('/admin/products');
@@ -56,25 +104,36 @@ const AddProductScreen = ({ history, match }) => {
 		}
 	}, [history, userInfo]);
 
-	const config = {
-		bucketName: process.env.REACT_APP_BUCKET_NAME,
-		dirName: process.env.REACT_APP_DIR_NAME,
-		region: process.env.REACT_APP_REGION,
-		accessKeyId: process.env.REACT_APP_ACCESSKEY,
-		secretAccessKey: process.env.REACT_APP_SECRET,
-	};
+	// const config = {
+	// 	bucketName: process.env.REACT_APP_BUCKET_NAME,
+	// 	dirName: process.env.REACT_APP_DIR_NAME,
+	// 	region: process.env.REACT_APP_REGION,
+	// 	accessKeyId: process.env.REACT_APP_ACCESSKEY,
+	// 	secretAccessKey: process.env.REACT_APP_SECRET,
+	// };
 
-	const uploadHandler = async (e) => {
+	const uploadHandler = (e) => {
 		console.log(e.target.files);
-		reactS3
-			.uploadFile(e.target.files[0], config)
-			.then((data) => {
-				console.log(data);
-				setImage(data.location);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		if (e.target.files.length !== 0) {
+			setFile(
+				Array.from(e.target.files).filter((f) => {
+					const ext = f.name.split('.').pop();
+					return ext === 'jpeg' || ext === 'png' || ext === 'jpg';
+				})[0]
+			);
+		} else {
+			setFile(null);
+		}
+		// console.log(e.target.files);
+		// reactS3
+		// 	.uploadFile(e.target.files[0], config)
+		// 	.then((data) => {
+		// 		console.log(data);
+		// 		setImage(data.location);
+		// 	})
+		// 	.catch((err) => {
+		// 		console.log(err);
+		// 	});
 	};
 
 	const createHandler = (e) => {
@@ -91,10 +150,10 @@ const AddProductScreen = ({ history, match }) => {
 			setMessage('Brand should not be empty');
 		} else if (!category) {
 			setMessage('Category should not be empty');
-		} else if (!image) {
+		} else if (!file) {
 			setMessage('Image should not be empty');
 		} else {
-			createProduct();
+			genrates3url();
 		}
 	};
 
