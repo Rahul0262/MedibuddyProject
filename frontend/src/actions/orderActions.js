@@ -22,6 +22,9 @@ export const createOrder = (orders) => async (dispatch, getState) => {
 		dispatch({
 			type: 'ORDER_CREATE_RESET',
 		});
+		dispatch({
+			type: 'CART_ONLY_RESET',
+		});
 	} catch (error) {
 		dispatch({
 			type: 'ORDER_CREATE_FAILED',

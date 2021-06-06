@@ -33,6 +33,11 @@ export const cartReducer = (
 				cartItems: [],
 				shippingAddress: {},
 			};
+		case 'CART_ONLY_RESET':
+			return {
+				cartItems: [],
+				shippingAddress: state.shippingAddress,
+			};
 		default:
 			return state;
 	}

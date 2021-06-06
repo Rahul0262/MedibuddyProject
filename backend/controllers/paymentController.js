@@ -9,14 +9,15 @@ const createOrder = asyncHandler(async (req, res) => {
 			key_secret: process.env.RAZORPAY_SECRET,
 		});
 
+		const randomNum = parseInt(Math.random() * 1000000);
 		const options = {
 			amount: req.body.amount, // amount in smallest currency unit
 			currency: 'INR',
-			receipt: 'receipt_order_234',
+			receipt: `receipt_order_${randomNum}`,
 		};
-
+		console.log(options);
 		const order = await instance.orders.create(options);
-
+		console.log(order);
 		if (!order) return res.status(500).send('Some error occured');
 
 		res.json(order);

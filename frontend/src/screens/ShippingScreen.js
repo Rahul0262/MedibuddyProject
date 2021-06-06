@@ -88,10 +88,16 @@ const ShippingScreen = ({ history }) => {
 					createOrder({
 						orderItems: cart.cartItems,
 						totalPrice,
-						shippingAddress,
+						shippingAddress: {
+							address,
+							city,
+							country,
+							postalCode,
+						},
 						paymentInfo: data,
 					})
 				);
+
 				// const result = await axios.post('http://localhost:5000/payment/success', data);
 
 				// alert(result.data.msg);
@@ -103,6 +109,9 @@ const ShippingScreen = ({ history }) => {
 		};
 
 		const paymentObject = new window.Razorpay(options);
+		paymentObject.on('payment.failed', function (response) {
+			setMessage(response.error.description);
+		});
 		paymentObject.open();
 	};
 
