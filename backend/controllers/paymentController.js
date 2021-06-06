@@ -15,7 +15,7 @@ const createOrder = asyncHandler(async (req, res) => {
 			currency: 'INR',
 			receipt: `receipt_order_${randomNum}`,
 		};
-		console.log(options);
+		// console.log(options);
 		const order = await instance.orders.create(options);
 		console.log(order);
 		if (!order) return res.status(500).send('Some error occured');
